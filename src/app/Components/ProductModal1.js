@@ -13,18 +13,43 @@ const THICKNESS_MULTIPLIERS = {
   "8mm": 1.3,
 };
 
-const BALLOON_PATH = `M 312 165.5 c -4 46.5 -14 87.5 -39 106.5 c -44 19 -79 14 -113 20 c -48 -25 -83 1 -105.6 -21.3 c -24.4 -26.7 15.6 -73.7 22.6 -107.7 c 13 -37 5 -83 33.4 -114.3 C 144 27 163 27 219 36 c 41 19.2 50 22.2 75 65.2 C 312 142 305 122 312 165.5 z`;
+const BALLOON_PATH = `M307.344 167.78c-1.464 43.413-32.194 82.436-66.933 99.759-57.94 12.919-79.403 12.919-113.06 15.846-34.632-9.756-40.973.488-57.07-28.779-6.342-38.047 16.097-72.68 10.731-118.531 1.464-45.364 23.863-78.013 54.632-87.802C164.3 36.726 167.054 39.479 223.958 52.328c41 19.2 46.802 24.724 71.191 68.137C305.393 147.293 297.1 129.245 305.393 152.659z`;
 
-// Helper function to get size multiplier based on selected size
-function getSizeMultiplier(selectedSize) {
-  switch(selectedSize.label?.toLowerCase()) {
-    case 'medium':
-      return 1.1; // 10% larger than small
-    case 'large':
-      return 1.2; // 20% larger than small
-    default: // 'small'
-      return 1.0;
+// Helper function to calculate scale based on selected size
+function calculateScale(sizes, selectedSize) {
+  // Get the size label
+  const sizeLabel = selectedSize.label;
+  
+  // Handle first three sizes with reduced scale (75%) and 5% increases
+  if (sizeLabel === "9×12" || sizeLabel === "12×16" || sizeLabel === "12×18") {
+    const smallSizeIndex = ["9×12", "12×16", "12×18"].indexOf(sizeLabel);
+    const smallSizeScale = Math.pow(1.05, smallSizeIndex); // 5% increase between small sizes
+    return smallSizeScale * 0.75; // Apply 25% reduction
   }
+  
+  // Special case for largest size (36×48) - 40% larger than previous size
+  if (sizeLabel === "36×48") {
+    const baseScale = Math.pow(1.05, 2) * 0.75; // Scale for 12x18
+    const mediumSizes = ["15×21", "20×30", "23×35"];
+    const LARGE_SIZE_INCREASE = 0.08; // 8% increase for medium sizes
+    const previousScale = baseScale * Math.pow(1 + LARGE_SIZE_INCREASE, mediumSizes.length);
+    // Make it exactly 40% larger than the previous size (23×35)
+    return previousScale * 1.40;
+  }
+  
+  // For medium sizes (15x21 to 23x35), start from the last small size scale and add 8% per step
+  const LARGE_SIZE_INCREASE = 0.08; // 8% increase for medium sizes
+  const mediumSizes = ["15×21", "20×30", "23×35"];
+  const mediumSizeIndex = mediumSizes.indexOf(sizeLabel);
+  
+  if (mediumSizeIndex !== -1) {
+    // Start from the scale of 12x18 and increase by 8% for each step
+    const baseScale = Math.pow(1.05, 2) * 0.75; // Scale for 12x18
+    return baseScale * Math.pow(1 + LARGE_SIZE_INCREASE, mediumSizeIndex + 1);
+  }
+  
+  // Fallback to base scale
+  return 1.0;
 }
 
 const ProductModal1 = ({ product, onClose }) => {
@@ -51,8 +76,8 @@ const ProductModal1 = ({ product, onClose }) => {
   // Rounded corners for rectangle-rounded
   const hasRoundedBorders = product.orientation === "rectangle-rounded";
 
-  // Get size multiplier based on selected size
-  const sizeMultiplier = getSizeMultiplier(selectedSize);
+  // Calculate scale based on size index
+  const scale = calculateScale(product.sizes, selectedSize);
 
   // Dynamic shadow based on thickness
   const getShadow = () => {
@@ -84,20 +109,22 @@ const ProductModal1 = ({ product, onClose }) => {
 
   // Calculate dynamic image dimensions based on selected size
   const getImageDimensions = () => {
-    // Base dimensions for each type
-    const basePortraitHeight = 180;
-    const baseLandscapeWidth = 240;
-    const baseCircleSize = 200;
-    const baseBalloonSize = 240;
+    // Base dimensions reduced by 25%
+    const basePortraitHeight = 150; // Reduced from 200
+    const baseLandscapeWidth = 187.5; // Reduced from 250
+    const baseUniformSize = 165;    // Reduced from 220
+
+    // Calculate scale based on size index
+    const scale = calculateScale(product.sizes, selectedSize);
 
     if (product.name.includes("Balloon Shape Acrylic Wall Photo")) {
-      const size = baseBalloonSize * sizeMultiplier;
+      const size = baseUniformSize * scale;
       return {
         width: `${size}px`,
         height: `${size}px`,
       };
     } else if (product.orientation === "circle") {
-      const size = baseCircleSize * sizeMultiplier;
+      const size = baseUniformSize * scale;
       return {
         width: `${size}px`,
         height: `${size}px`,
@@ -105,13 +132,13 @@ const ProductModal1 = ({ product, onClose }) => {
     } else {
       // For portrait/rectangle images
       if (isPortrait) {
-        const height = basePortraitHeight * sizeMultiplier;
+        const height = basePortraitHeight * scale;
         return {
           width: `${height * 0.75}px`, // maintain 3:4 ratio
           height: `${height}px`,
         };
       } else {
-        const width = baseLandscapeWidth * sizeMultiplier;
+        const width = baseLandscapeWidth * scale;
         return {
           width: `${width}px`,
           height: `${width * 0.75}px`, // maintain 4:3 ratio
@@ -228,7 +255,7 @@ const ProductModal1 = ({ product, onClose }) => {
                           {size.label}
                         </div>
                         <div className="small text-muted">
-                          ${Number(size.price).toFixed(2)}
+                          {Number(size.price).toFixed(2)}
                         </div>
                       </button>
                     ))}
@@ -265,11 +292,11 @@ const ProductModal1 = ({ product, onClose }) => {
                 <div
                   className="border rounded-4 d-flex align-items-center justify-content-center position-relative"
                   style={{
-                    minHeight: isPortrait ? "500px" : "400px",
-                    maxHeight: "60vh",
+                    width: "100%",
+                    height: "400px", // Fixed height to match reference
                     overflow: "visible",
                     backgroundColor: "#f8f9fa",
-                    padding: "18px",
+                    padding: "32px", // Increased padding for better spacing
                     backgroundImage: uploadedImage
                       ? "url('/mockup/wall-frame.png')"
                       : "none",
@@ -435,7 +462,7 @@ const ProductModal1 = ({ product, onClose }) => {
                       </p>
                     </div>
                     <h5 className="fw-bold text-success mb-0">
-                      ${computedPrice}
+                      Rs.{computedPrice}
                     </h5>
                   </div>
 

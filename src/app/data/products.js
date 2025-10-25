@@ -9,9 +9,13 @@ export const products = [
       "/mockup/4-500x500.jpg",
     ],
     sizes: [
-      { label: "Small", price: 30 },
-      { label: "Medium", price: 50 },
-      { label: "Large", price: 70 },
+      { label: "9×12", w: 9, h: 12, price: 699, price5mm: 999, price8mm: 1399 }, // ₹699, ₹999, ₹1399
+      { label: "12×16", w: 12, h: 16, price: 1099, price5mm: 1799, price8mm: 2399 }, // ₹1099, ₹1799, ₹2399
+      { label: "12×18", w: 12, h: 18, price: 1499, price5mm: 1999, price8mm: 2799 }, // ₹1499, ₹1999, ₹2799
+      { label: "15×21", w: 15, h: 21, price: 1999, price5mm: 2799, price8mm: 3999 }, // ₹1999, ₹2799, ₹3999
+      { label: "20×30", w: 20, h: 30, price: 3499, price5mm: 4499, price8mm: 5999 }, // ₹3499, ₹4499, ₹5999
+      { label: "23×35", w: 23, h: 35, price: 4499, price5mm: 5499, price8mm: 7999 }, // ₹4499, ₹5499, ₹7999
+      { label: "36×48", w: 36, h: 48, price: 24999, price5mm: 24999, price8mm: 24999 }, // ₹24999 (8mm only)
     ],
     orientation: "rectangle",
   },
@@ -21,9 +25,13 @@ export const products = [
     defaultImage: "/mockup/Landscape-min-500x500.jpg",
     images: ["/mockup/l1.jpg", "/mockup/l2.jpg", "/mockup/l3.jpg"],
     sizes: [
-      { label: "Small", price: 35 },
-      { label: "Medium", price: 55 },
-      { label: "Large", price: 75 },
+      { label: "12×9", w: 12, h: 9, price: 699, price5mm: 999, price8mm: 1399 },
+      { label: "16×12", w: 16, h: 12, price: 1099, price5mm: 1799, price8mm: 2399 },
+      { label: "18×12", w: 18, h: 12, price: 1499, price5mm: 1999, price8mm: 2799 },
+      { label: "21×15", w: 21, h: 15, price: 1999, price5mm: 2799, price8mm: 3999 },
+      { label: "30×20", w: 30, h: 20, price: 3499, price5mm: 4499, price8mm: 5999 },
+      { label: "35×23", w: 35, h: 23, price: 4499, price5mm: 5499, price8mm: 7999 },
+      { label: "48×36", w: 48, h: 36, price: 24999, price5mm: 24999, price8mm: 24999 },
     ],
     orientation: "rectangle",
   },
@@ -37,11 +45,15 @@ export const products = [
       "/mockup/1-min-37-500x500.jpg",
     ],
     sizes: [
-      { label: "Small", price: 40 },
-      { label: "Medium", price: 60 },
-      { label: "Large", price: 80 },
+      { label: "9×12", w: 9, h: 12, price: 699, price5mm: 999, price8mm: 1399 },
+      { label: "12×16", w: 12, h: 16, price: 1099, price5mm: 1799, price8mm: 2399 },
+      { label: "12×18", w: 12, h: 18, price: 1499, price5mm: 1999, price8mm: 2799 },
+      { label: "15×21", w: 15, h: 21, price: 1999, price5mm: 2799, price8mm: 3999 },
+      { label: "20×30", w: 20, h: 30, price: 3499, price5mm: 4499, price8mm: 5999 },
+      { label: "23×35", w: 23, h: 35, price: 4499, price5mm: 5499, price8mm: 7999 },
+      { label: "36×48", w: 36, h: 48, price: 24999, price5mm: 24999, price8mm: 24999 },
     ],
-    orientation: "circle", // ✅ this activates circular crop in modal + slider
+    orientation: "circle",
   },
   {
     id: 4,
@@ -53,15 +65,19 @@ export const products = [
       "/mockup/5-min-54-500x500.jpg",
     ],
     sizes: [
-      { label: "Small", price: 40 },
-      { label: "Medium", price: 60 },
-      { label: "Large", price: 80 },
+      { label: "9×12", w: 9, h: 12, price: 699, price5mm: 999, price8mm: 1399 },
+      { label: "12×16", w: 12, h: 16, price: 1099, price5mm: 1799, price8mm: 2399 },
+      { label: "12×18", w: 12, h: 18, price: 1499, price5mm: 1999, price8mm: 2799 },
+      { label: "15×21", w: 15, h: 21, price: 1999, price5mm: 2799, price8mm: 3999 },
+      { label: "20×30", w: 20, h: 30, price: 3499, price5mm: 4499, price8mm: 5999 },
+      { label: "23×35", w: 23, h: 35, price: 4499, price5mm: 5499, price8mm: 7999 },
+      { label: "36×48", w: 36, h: 48, price: 24999, price5mm: 24999, price8mm: 24999 },
     ],
-    orientation: "rectangle-rounded", // ✅ this activates circular crop in modal + slider
+    orientation: "rectangle-rounded",
   },
   {
     id: 5,
-    name: "Rounded Rect Portrait Acrylic Wall Photo",
+    name: "Rounded Rect Landscape Acrylic Wall Photo",
     defaultImage: "/mockup/Rounded-Rect-Landscape-Acrylic-Wall-Phot-min-500x500.jpg",
     images: [
       "/mockup/4-min-50-500x500.jpg",
@@ -69,11 +85,15 @@ export const products = [
       "/mockup/5-min-51-500x500.jpg",
     ],
     sizes: [
-      { label: "Small", price: 40 },
-      { label: "Medium", price: 60 },
-      { label: "Large", price: 80 },
+      { label: "12×9", w: 12, h: 9, price: 699, price5mm: 999, price8mm: 1399 },
+      { label: "16×12", w: 16, h: 12, price: 1099, price5mm: 1799, price8mm: 2399 },
+      { label: "18×12", w: 18, h: 12, price: 1499, price5mm: 1999, price8mm: 2799 },
+      { label: "21×15", w: 21, h: 15, price: 1999, price5mm: 2799, price8mm: 3999 },
+      { label: "30×20", w: 30, h: 20, price: 3499, price5mm: 4499, price8mm: 5999 },
+      { label: "35×23", w: 35, h: 23, price: 4499, price5mm: 5499, price8mm: 7999 },
+      { label: "48×36", w: 48, h: 36, price: 24999, price5mm: 24999, price8mm: 24999 },
     ],
-    orientation: "rectangle-rounded", // ✅ this activates circular crop in modal + slider
+    orientation: "rectangle-rounded",
   },
   {
     id: 6,
@@ -85,10 +105,14 @@ export const products = [
       "/mockup/3-min-35-500x500.jpg",
     ],
     sizes: [
-      { label: "Small", price: 40 },
-      { label: "Medium", price: 60 },
-      { label: "Large", price: 80 },
+      { label: "9×12", w: 9, h: 12, price: 699, price5mm: 999, price8mm: 1399 },
+      { label: "12×16", w: 12, h: 16, price: 1099, price5mm: 1799, price8mm: 2399 },
+      { label: "12×18", w: 12, h: 18, price: 1499, price5mm: 1999, price8mm: 2799 },
+      { label: "15×21", w: 15, h: 21, price: 1999, price5mm: 2799, price8mm: 3999 },
+      { label: "20×30", w: 20, h: 30, price: 3499, price5mm: 4499, price8mm: 5999 },
+      { label: "23×35", w: 23, h: 35, price: 4499, price5mm: 5499, price8mm: 7999 },
+      { label: "36×48", w: 36, h: 48, price: 24999, price5mm: 24999, price8mm: 24999 },
     ],
-    orientation: "rectangle-rounded", // ✅ this activates circular crop in modal + slider
+    orientation: "rectangle-rounded",
   },
 ];

@@ -13,9 +13,19 @@ const THICKNESS_MULTIPLIERS = {
   "8mm": 1.3,
 };
 
-const BALLOON_PATH = `M312,165.5c3.4,45.9-9.7,90.9-40.6,118.2c-30.9,27.3-79.4,36.8-122.8,33.6c-43.4-3.3-81.6-19.4-103.8-49.4
-c-22.2-30-28.3-73.8-18.6-113.7c9.7-39.9,35.3-75.8,70.9-94.5C133.7,41,178.4,37.5,220,44.8c41.6,7.3,80.9,25.3,104.9,53.1
-C349,125.7,308.6,119.6,312,165.5z`;
+const BALLOON_PATH = `M 312 165.5 c -4 46.5 -14 87.5 -39 106.5 c -44 19 -79 14 -113 20 c -48 -25 -83 1 -105.6 -21.3 c -24.4 -26.7 15.6 -73.7 22.6 -107.7 c 13 -37 5 -83 33.4 -114.3 C 144 27 163 27 219 36 c 41 19.2 50 22.2 75 65.2 C 312 142 305 122 312 165.5 z`;
+
+// Helper function to get size multiplier based on selected size
+function getSizeMultiplier(selectedSize) {
+  switch(selectedSize.label?.toLowerCase()) {
+    case 'medium':
+      return 1.1; // 10% larger than small
+    case 'large':
+      return 1.2; // 20% larger than small
+    default: // 'small'
+      return 1.0;
+  }
+}
 
 const ProductModal1 = ({ product, onClose }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
@@ -40,6 +50,77 @@ const ProductModal1 = ({ product, onClose }) => {
 
   // Rounded corners for rectangle-rounded
   const hasRoundedBorders = product.orientation === "rectangle-rounded";
+
+  // Get size multiplier based on selected size
+  const sizeMultiplier = getSizeMultiplier(selectedSize);
+
+  // Dynamic shadow based on thickness
+  const getShadow = () => {
+    switch (thickness) {
+      case "3mm":
+        return "0 4px 12px rgba(0,0,0,0.35)";
+      case "5mm":
+        return "0 8px 20px rgba(0,0,0,0.45)";
+      case "8mm":
+        return "0 12px 28px rgba(0,0,0,0.55)";
+      default:
+        return "0 6px 16px rgba(0,0,0,0.4)";
+    }
+  };
+
+  // Get dimensions for labels
+  const getDimensions = () => {
+    const w = selectedSize.w || 9;
+    const h = selectedSize.h || 12;
+    return {
+      width: w,
+      height: h,
+      widthCm: (w * 2.54).toFixed(2),
+      heightCm: (h * 2.54).toFixed(2),
+    };
+  };
+
+  const dimensions = getDimensions();
+
+  // Calculate dynamic image dimensions based on selected size
+  const getImageDimensions = () => {
+    // Base dimensions for each type
+    const basePortraitHeight = 180;
+    const baseLandscapeWidth = 240;
+    const baseCircleSize = 200;
+    const baseBalloonSize = 240;
+
+    if (product.name.includes("Balloon Shape Acrylic Wall Photo")) {
+      const size = baseBalloonSize * sizeMultiplier;
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+      };
+    } else if (product.orientation === "circle") {
+      const size = baseCircleSize * sizeMultiplier;
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+      };
+    } else {
+      // For portrait/rectangle images
+      if (isPortrait) {
+        const height = basePortraitHeight * sizeMultiplier;
+        return {
+          width: `${height * 0.75}px`, // maintain 3:4 ratio
+          height: `${height}px`,
+        };
+      } else {
+        const width = baseLandscapeWidth * sizeMultiplier;
+        return {
+          width: `${width}px`,
+          height: `${width * 0.75}px`, // maintain 4:3 ratio
+        };
+      }
+    }
+  };
+
+  const imageDimensions = getImageDimensions();
 
   return (
     <div
@@ -180,83 +261,163 @@ const ProductModal1 = ({ product, onClose }) => {
 
               {/* RIGHT SIDE */}
               <div className="col-md-6 d-flex flex-column">
-                {/* Preview */}
+                {/* Preview with Background Mockup and Dynamic Labels */}
                 <div
-                  className="border rounded-4 bg-light d-flex align-items-center justify-content-center"
+                  className="border rounded-4 d-flex align-items-center justify-content-center position-relative"
                   style={{
-                    minHeight: isPortrait ? "380px" : "260px",
-                    maxHeight: "50vh",
-                    overflow: "hidden",
+                    minHeight: isPortrait ? "500px" : "400px",
+                    maxHeight: "60vh",
+                    overflow: "visible",
                     backgroundColor: "#f8f9fa",
                     padding: "18px",
+                    backgroundImage: uploadedImage
+                      ? "url('/mockup/wall-frame.png')"
+                      : "none",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
                   }}
                 >
                   {uploadedImage ? (
-                    product.name.includes("Balloon Shape Acrylic Wall Photo") ? (
-                      <svg
-                        width="360"
-                        height="360"
-                        viewBox="0 0 360 360"
-                        style={{
-                          display: "block",
-                          margin: "0 auto",
-                          boxShadow:
-                            "0 6px 20px rgba(0,0,0,0.15)",
-                          borderRadius: "30px",
-                          // optional: match the reference modal
-                        }}
-                      >
-                        <defs>
-                          <clipPath id="balloon-clip">
-                            <path d={BALLOON_PATH} />
-                          </clipPath>
-                        </defs>
-                        <image
-                          href={uploadedImage}
-                          width="360"
-                          height="360"
-                          style={{
-                            clipPath: "url(#balloon-clip)"
-                          }}
-                          preserveAspectRatio="xMidYMid slice"
-                        />
-                      </svg>
-                    ) : product.orientation === "circle" ? (
+                    <>
+                      {/* Top Width Label */}
                       <div
-                        className="mx-auto position-relative"
                         style={{
-                          width: "320px",
-                          height: "320px",
-                          borderRadius: "50%",
-                          overflow: "hidden",
-                          boxShadow:
-                            "0 6px 20px rgba(0,0,0,0.12)",
+                          position: "absolute",
+                          top: "10px",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          color: "#000",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                          whiteSpace: "nowrap",
+                          backgroundColor: "#fff",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                          zIndex: 10,
                         }}
                       >
-                        <img
-                          src={uploadedImage}
-                          alt="preview"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
+                        {dimensions.width} inches ({dimensions.widthCm} cm)
                       </div>
-                    ) : (
-                      <img
-                        src={uploadedImage}
-                        alt="preview"
+
+                      {/* Left Height Label (Rotated) */}
+                      <div
                         style={{
-                          width: isPortrait ? "auto" : "100%",
-                          height: isPortrait ? "100%" : "auto",
-                          aspectRatio: isPortrait ? "3 / 4" : "4 / 3",
-                          objectFit: "cover",
-                          borderRadius: hasRoundedBorders ? "20px" : "0px",
-                          maxHeight: "100%",
+                          position: "absolute",
+                          left: "-30px",
+                          top: "50%",
+                          transform: "translateY(-50%) rotate(-90deg)",
+                          color: "#000",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                          whiteSpace: "nowrap",
+                          backgroundColor: "#fff",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                          zIndex: 10,
                         }}
-                      />
-                    )
+                      >
+                        {dimensions.height} inches ({dimensions.heightCm} cm)
+                      </div>
+
+                      {/* Bottom Thickness Label */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: "10px",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          color: "#000",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                          whiteSpace: "nowrap",
+                          backgroundColor: "#fff",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                          zIndex: 10,
+                        }}
+                      >
+                        Thickness: {thickness}
+                      </div>
+
+                      {/* Preview Image with Dynamic Scaling */}
+                      <div
+                        className="position-relative"
+                        style={{
+                          zIndex: 2,
+                          transition: "all 0.3s ease",
+                        }}
+                      >
+                        {product.name.includes("Balloon Shape Acrylic Wall Photo") ? (
+                          <svg
+                            width={imageDimensions.width}
+                            height={imageDimensions.height}
+                            viewBox="0 0 360 360"
+                            style={{
+                              display: "block",
+                              margin: "0 auto",
+                              // boxShadow: getShadow(),
+                              borderRadius: "30px",
+                              transition: "all 0.3s ease",
+                            }}
+                          >
+                            <defs>
+                              <clipPath id="balloon-clip">
+                                <path d={BALLOON_PATH} />
+                              </clipPath>
+                            </defs>
+                            <image
+                              href={uploadedImage}
+                              width="360"
+                              height="360"
+                              style={{
+                                clipPath: "url(#balloon-clip)",
+                              }}
+                              preserveAspectRatio="xMidYMid slice"
+                            />
+                          </svg>
+                        ) : product.orientation === "circle" ? (
+                          <div
+                            className="mx-auto position-relative"
+                            style={{
+                              width: imageDimensions.width,
+                              height: imageDimensions.height,
+                              borderRadius: "50%",
+                              overflow: "hidden",
+                              boxShadow: getShadow(),
+                              transition: "all 0.3s ease",
+                            }}
+                          >
+                            <img
+                              src={uploadedImage}
+                              alt="preview"
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <img
+                            src={uploadedImage}
+                            alt="preview"
+                            style={{
+                              width: imageDimensions.width,
+                              height: imageDimensions.height,
+                              aspectRatio: isPortrait ? "3 / 4" : "4 / 3",
+                              objectFit: "cover",
+                              borderRadius: hasRoundedBorders ? "20px" : "0px",
+                              boxShadow: getShadow(),
+                              transition: "all 0.3s ease",
+                            }}
+                          />
+                        )}
+                      </div>
+                    </>
                   ) : (
                     <div className="text-muted small text-center">
                       Upload a photo to see preview
@@ -268,9 +429,7 @@ const ProductModal1 = ({ product, onClose }) => {
                 <div className="mt-4 border rounded-4 p-4 bg-white shadow-sm">
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <div>
-                      <h6 className="mb-1 fw-semibold">
-                        {product.name}
-                      </h6>
+                      <h6 className="mb-1 fw-semibold">{product.name}</h6>
                       <p className="small text-muted mb-0">
                         {selectedSize.label} • {thickness}
                       </p>
